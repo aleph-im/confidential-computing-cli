@@ -194,7 +194,7 @@ def inject_secret(
     )
 
     typer.echo("Uploading the secret table and launching the VM...")
-    endpoint = f"/vm/{vm_id}/sev/inject-secrets"
+    endpoint = f"/vm/{vm_id}/sev/inject-secret"
 
     response = requests.post(
         cli_config.server_url + endpoint,

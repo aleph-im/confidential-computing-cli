@@ -10,12 +10,12 @@ from zipfile import ZipFile
 import sevtool
 from toolkit.certificates import generate_launch_blob, get_platform_certificates_dir
 
-certificates_ns = typer.Typer()
+platform_ns = typer.Typer()
 
 
-@certificates_ns.command()
-def get_platform_certificates(ctx: typer.Context):
-    endpoint = "/sev/platform/certificates"
+@platform_ns.command()
+def get_certificates(ctx: typer.Context):
+    endpoint = "/platform/certificates"
 
     cli_config = cast(CliConfig, ctx.obj)
 
@@ -31,7 +31,7 @@ def get_platform_certificates(ctx: typer.Context):
     typer.echo(f"Platform certificates written to '{certificates_dir}'.")
 
 
-@certificates_ns.command()
+@platform_ns.command()
 def validate_platform_certificates(ctx: typer.Context):
     cli_config = cast(CliConfig, ctx.obj)
 
@@ -47,7 +47,7 @@ def validate_platform_certificates(ctx: typer.Context):
         )
 
 
-@certificates_ns.command()
+@platform_ns.command()
 def generate_guest_owner_certificates(
     ctx: typer.Context,
     policy: str = typer.Argument(None, help="SEV guest policy."),
