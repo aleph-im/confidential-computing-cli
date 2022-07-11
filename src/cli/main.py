@@ -3,9 +3,9 @@ from typing import Optional
 
 import typer
 
-from cli_config import CliConfig
-from commands.certificates import certificates_ns
-from commands.vms import vm_ns
+from cli.cli_config import CliConfig
+from cli.commands.platform import platform_ns
+from cli.commands.vms import vm_ns
 
 app = typer.Typer()
 
@@ -49,7 +49,7 @@ def main(
     ctx.obj = cli_config
 
 
-app.add_typer(certificates_ns, name="certificate", help="Download and upload SEV certificates from the platform.")
+app.add_typer(platform_ns, name="platform", help="Get information about the CRN platform.")
 app.add_typer(vm_ns, name="vm", help="Create, start and manage virtual machines (VMs).")
 # app.add_typer(migrations_ns, name="migrations", help="Run DB migrations.")
 
