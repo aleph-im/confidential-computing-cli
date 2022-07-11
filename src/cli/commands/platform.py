@@ -1,14 +1,12 @@
-import typer
-
-from cli_config import CliConfig
 from typing import cast
-from pathlib import Path
-from urllib.parse import urlparse
-from toolkit.download_file import download_file
 from zipfile import ZipFile
 
-import sevtool
-from toolkit.certificates import generate_launch_blob, get_platform_certificates_dir
+import typer
+
+import cli.toolkit.sevtool as sevtool
+from cli.cli_config import CliConfig
+from cli.toolkit.certificates import generate_launch_blob, get_platform_certificates_dir
+from cli.toolkit.download_file import download_file
 
 platform_ns = typer.Typer()
 

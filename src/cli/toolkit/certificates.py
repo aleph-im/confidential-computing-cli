@@ -7,7 +7,7 @@ from uuid import UUID
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
 
-import sevtool
+from .sevtool import generate_launch_blob as sevtool_generate_launch_blob
 
 CERTIFICATES_DIR = Path.cwd() / "certificates"
 
@@ -23,7 +23,7 @@ def get_vm_certificates_dir(vm_id: str) -> Path:
 
 def generate_launch_blob(policy: str, server_url: str) -> None:
     platform_certificates_dir = get_platform_certificates_dir(server_url)
-    sevtool.generate_launch_blob(platform_certificates_dir, policy)
+    sevtool_generate_launch_blob(platform_certificates_dir, policy)
 
 
 def load_tik_tek_keys(vm_id: str) -> Tuple[bytes, bytes]:
@@ -96,7 +96,7 @@ def make_secret_table(disk_secret: str) -> bytearray:
     secret_table[36:40] = (16 + 4 + len(disk_secret) + 1).to_bytes(
         4, byteorder="little"
     )
-    secret_table[40 : 40 + len(disk_secret)] = disk_secret.encode()
+    secret_table[40: 40 + len(disk_secret)] = disk_secret.encode()
 
     return secret_table
 
@@ -127,13 +127,13 @@ def make_packet_header(
     # ultimately needs to be an argument, but there's only
     # compressed and no real use case
     ##
-    FLAGS = 0
+    flags = 0
 
     ##
     # Table 55. LAUNCH_SECRET Packet Header Buffer
     ##
     header = bytearray(52)
-    header[0:4] = FLAGS.to_bytes(4, byteorder="little")
+    header[0:4] = flags.to_bytes(4, byteorder="little")
     header[4:20] = iv
 
     h = hmac.new(tik, digestmod="sha256")

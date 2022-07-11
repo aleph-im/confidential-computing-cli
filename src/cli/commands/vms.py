@@ -9,8 +9,8 @@ import requests
 import typer
 from requests.auth import HTTPBasicAuth
 
-from cli_config import CliConfig
-from toolkit.certificates import (
+from cli.cli_config import CliConfig
+from cli.toolkit.certificates import (
     generate_launch_blob,
     get_vm_certificates_dir,
     get_platform_certificates_dir,
