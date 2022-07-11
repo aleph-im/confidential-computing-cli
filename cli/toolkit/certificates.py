@@ -1,5 +1,4 @@
 import hmac
-import os
 from pathlib import Path
 from typing import Dict, Tuple
 from urllib.parse import urlparse
