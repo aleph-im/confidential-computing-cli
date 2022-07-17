@@ -7,7 +7,7 @@ from uuid import UUID
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
 
-from .sevtool import generate_launch_blob as sevtool_generate_launch_blob
+from cli.toolkit.sev.sevtool import generate_launch_blob as sevtool_generate_launch_blob
 
 CERTIFICATES_DIR = Path.cwd() / "certificates"
 
