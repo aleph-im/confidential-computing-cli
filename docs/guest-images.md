@@ -71,7 +71,7 @@ uname -r    # Should print 5.18.0-0.bpo.1-cloud-amd64
 
 ```shell
 apt update
-apt install cryptsetup guestmount
+apt install cryptsetup
 ```
 
 You can then halt the VM and exit Qemu (Ctrl-A, then X).
