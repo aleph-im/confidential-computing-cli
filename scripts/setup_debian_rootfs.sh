@@ -81,3 +81,6 @@ umount /boot/efi
 
 # Update initramfs after changes to fstab and crypttab
 update-initramfs -u
+
+# Generate system SSH keys
+ssh-keygen -A
