@@ -25,7 +25,7 @@ Then, we will extract the root file system to a tarball for later use.
 Any "nocloud" Debian image will do. As an example:
 
 ```shell
-curl https://cloud.debian.org/images/cloud/bullseye/20220613-1045/debian-11-nocloud-amd64-20220613-1045.qcow2
+curl -L https://cloud.debian.org/images/cloud/bullseye/20220613-1045/debian-11-nocloud-amd64-20220613-1045.qcow2 -o debian-11-nocloud-amd64-20220613-1045.qcow2
 ```
 
 ### 2. Start the VM with Qemu
@@ -71,7 +71,7 @@ uname -r    # Should print 5.18.0-0.bpo.1-cloud-amd64
 
 ```shell
 apt update
-apt install cryptsetup
+DEBIAN_FRONTEND=noninteractive apt install cryptsetup cryptsetup-initramfs
 ```
 
 You can then halt the VM and exit Qemu (Ctrl-A, then X).
