@@ -64,11 +64,15 @@ echo "KEYFILE_PATTERN=\"/etc/cryptsetup-keys.d/*\"" >>/etc/cryptsetup-initramfs/
 # Reduce the accessibility of the initramfs
 echo "UMASK=0077" >> /etc/initramfs-tools/initramfs.conf
 
+MAPPER_NAME=cr_root
+MAPPED_DEVICE_ID="/dev/mapper/${MAPPER_NAME}"
+
 # Configure Grub and crypttab
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
-echo "cr_root UUID=${OS_PARTITION_UUID} ${KEY_FILE} luks" >> /etc/crypttab
+echo 'GRUB_PRELOAD_MODULES="luks cryptodisk lvm ext2"' >> /etc/default/grub
+echo "${MAPPER_NAME} UUID=${OS_PARTITION_UUID} ${KEY_FILE} luks" >> /etc/crypttab
 cat << EOF > /etc/fstab
-/dev/mapper/cr_root / ext4 rw,discard,errors=remount-ro 0 1
+${MAPPED_DEVICE_ID} / ext4 rw,discard,errors=remount-ro 0 1
 UUID=${BOOT_PARTITION_UUID} /boot/efi vfat defaults 0 0
 EOF
 
@@ -78,6 +82,9 @@ grub-install --target=x86_64-efi --removable
 grub-install --target=x86_64-efi --recheck
 grub-mkconfig -o /boot/grub/grub.cfg
 umount /boot/efi
+
+# Force Grub config to use a crypt device
+sed -i "s+root=PARTUUID= +cryptdevice=UUID=${OS_PARTITION_UUID}:${MAPPER_NAME} root=${MAPPED_DEVICE_ID} +g" /boot/grub/grub.cfg
 
 # Update initramfs after changes to fstab and crypttab
 update-initramfs -u
