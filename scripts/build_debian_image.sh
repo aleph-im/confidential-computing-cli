@@ -89,7 +89,7 @@ sudo mkfs.vfat "${BOOT_PARTITION_DEVICE_ID}"
 echo "Encrypting and formatting the OS partition..."
 MAPPER_NAME=cr_root
 MAPPED_DEVICE_ID="/dev/mapper/${MAPPER_NAME}"
-MOUNT_POINT="/mnt/cr_root"
+MOUNT_POINT="/mnt/${MAPPER_NAME}"
 echo -n "${DISK_PASSWORD}" >"${KEY_FILE}"
 
 sudo cryptsetup --batch-mode --type luks1 --key-file "${KEY_FILE}" luksFormat "${OS_PARTITION_DEVICE_ID}"
