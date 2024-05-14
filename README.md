@@ -82,7 +82,7 @@ At the moment, this requires:
 
 To set the config for the client, you can use environment variables
 ```
-export SERVER_URL=http://127.0.0.1:9201/vm
+export SERVER_URL=http://127.0.0.1:9201
 export CRN_USER=olivier
 export CRN_PASSWORD=abc123
 

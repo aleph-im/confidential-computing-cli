@@ -43,7 +43,7 @@ def create(ctx: typer.Context):
 def get(ctx: typer.Context, vm_id: str):
     cli_config = cast(CliConfig, ctx.obj)
     response = requests.get(
-        cli_config.server_url + f"/vm/{vm_id}",
+        cli_config.server_url + f"/vm/vm/{vm_id}",
         auth=HTTPBasicAuth(cli_config.username, cli_config.password),
     )
     response.raise_for_status()
@@ -55,7 +55,7 @@ def get(ctx: typer.Context, vm_id: str):
 def upload_image(ctx: typer.Context, vm_id: str, tarball_path: Path, image_name: str):
     cli_config = cast(CliConfig, ctx.obj)
 
-    endpoint = f"/vm/{vm_id}/upload-image"
+    endpoint = f"/vm/vm/{vm_id}/upload-image"
 
     typer.echo(
         f"Uploading VM image to {cli_config.server_url}. "
@@ -83,7 +83,7 @@ def upload_certificates(
     cli_config = cast(CliConfig, ctx.obj)
     server_url = cli_config.server_url
 
-    endpoint = f"/vm/{vm_id}/upload-guest-owner-certificates"
+    endpoint = f"/vm/vm/{vm_id}/upload-guest-owner-certificates"
 
     typer.echo("Generating launch blob...")
     generate_launch_blob(policy=policy, server_url=server_url)
@@ -119,7 +119,7 @@ def upload_certificates(
 def start(ctx: typer.Context, vm_id: str):
     cli_config = cast(CliConfig, ctx.obj)
 
-    endpoint = f"/vm/{vm_id}/start"
+    endpoint = f"/vm/vm/{vm_id}/start"
 
     response = requests.post(
         cli_config.server_url + endpoint,
@@ -130,7 +130,7 @@ def start(ctx: typer.Context, vm_id: str):
 
 
 def fetch_measure(vm_id: str, cli_config: CliConfig):
-    endpoint = f"/vm/{vm_id}/sev/measure"
+    endpoint = f"/vm/vm/{vm_id}/sev/measure"
 
     response = requests.get(
         cli_config.server_url + endpoint,
@@ -194,7 +194,7 @@ def inject_secret(
     )
 
     typer.echo("Uploading the secret table and launching the VM...")
-    endpoint = f"/vm/{vm_id}/sev/inject-secret"
+    endpoint = f"/vm/vm/{vm_id}/sev/inject-secret"
 
     response = requests.post(
         cli_config.server_url + endpoint,
