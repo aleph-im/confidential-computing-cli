@@ -44,25 +44,11 @@ def sevtool_cmd(*args, volumes: Optional[Dict[str, str]] = None):
 def validate_cert_chain(certificates_dir: Path) -> bool:
     # TODO: use the original certificate chain from the AMD website and not the one provided
     #       by the Platform Owner!!! Only use this for demo purposes or on platforms we own.
-    container_certificates_dir = "/opt/certificates"
-
-    _ = sevtool_cmd(
-        "--ofolder",
-        container_certificates_dir,
-        "--validate_cert_chain",
-        volumes={str(certificates_dir.absolute()): container_certificates_dir},
-    )
+    subprocess.run(["sevctl", "verify", "--sev",  str(certificates_dir.absolute()) + "/platform_certificates.pem", "1"])
 
     return True
 
 
-def generate_launch_blob(certificates_dir: Path, policy: str) -> None:
-    container_certificates_dir = "/opt/certificates"
+def generate_launch_blob(certificates_dir: Path, vm_certificates_dir: Path,  policy: str) -> None:
+    subprocess.run(["sevctl", "session",  '--name',  str(vm_certificates_dir) + '/vm', str(certificates_dir.absolute()) + "/platform_certificates.pem", "1"])
 
-    _ = sevtool_cmd(
-        "--ofolder",
-        container_certificates_dir,
-        "--generate_launch_blob",
-        policy,
-        volumes={str(certificates_dir.absolute()): container_certificates_dir},
-    )
