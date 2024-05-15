@@ -30,8 +30,8 @@ while test -n "$1"; do
     LOOP_DEVICE_ID=$2
     shift
     ;;
-  -p | --password)
-      DISK_PASSWORD=$2
+  -p | --mapper-name)
+      MAPPER_NAME=$2
       shift 2
       ;;
   esac
