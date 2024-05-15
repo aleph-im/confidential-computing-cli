@@ -21,11 +21,8 @@ def get_certificates(ctx: typer.Context):
     certificates_dir = get_platform_certificates_dir(cli_config.server_url)
     certificates_dir.mkdir(parents=True, exist_ok=True)
 
-    zip_file = certificates_dir / "platform_certificates.zip"
-    download_file(cli_config.server_url + endpoint, zip_file)
-
-    with ZipFile(zip_file) as zip_file:
-        zip_file.extractall(path=certificates_dir)
+    cert_file = certificates_dir / "platform_certificates.pem"
+    download_file(cli_config.server_url + endpoint, cert_file)
 
     typer.echo(f"Platform certificates written to '{certificates_dir}'.")
 

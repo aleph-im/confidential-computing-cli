@@ -25,9 +25,10 @@ def get_vm_certificates_dir(vm_id: str) -> Path:
     return CERTIFICATES_DIR / "vms" / vm_id
 
 
-def generate_launch_blob(policy: str, server_url: str) -> None:
+def generate_launch_blob(policy: str, server_url: str, vm_id: str) -> None:
     platform_certificates_dir = get_platform_certificates_dir(server_url)
-    sevtool_generate_launch_blob(platform_certificates_dir, policy)
+    vm_certificates_dir = get_vm_certificates_dir(vm_id)
+    sevtool_generate_launch_blob(platform_certificates_dir, vm_certificates_dir, policy)
 
 
 def load_tik_tek_keys(vm_id: str) -> Tuple[bytes, bytes]:

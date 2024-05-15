@@ -86,20 +86,20 @@ def upload_certificates(
     endpoint = f"/vm/vm/{vm_id}/upload-guest-owner-certificates"
 
     typer.echo("Generating launch blob...")
-    generate_launch_blob(policy=policy, server_url=server_url)
+    generate_launch_blob(policy=policy, server_url=server_url, vm_id=vm_id)
 
     platform_certificates_dir = get_platform_certificates_dir(server_url)
     vm_certificates_dir = get_vm_certificates_dir(vm_id)
     vm_certificates_dir.mkdir(exist_ok=True, parents=True)
 
-    for filename in ("godh.cert", "tmp_tk.bin", "launch_blob.bin"):
+    for filename in ("platform_certificates.pem", ):
         source = platform_certificates_dir / filename
         source.rename(vm_certificates_dir / filename)
 
     typer.echo("Creating certificates archive for upload...")
     certificates_archive = vm_certificates_dir / "guest-owner-certificates.zip"
     with ZipFile(certificates_archive, "w") as zip_file:
-        for filename in ("godh.cert", "launch_blob.bin"):
+        for filename in ("vm_godh.b64", "vm_session.b64"):
             zip_file.write(vm_certificates_dir / filename, filename)
 
     typer.echo(f"Uploading guest owner certificates to {cli_config.server_url}.")
@@ -122,7 +122,7 @@ def start(ctx: typer.Context, vm_id: str):
     endpoint = f"/vm/vm/{vm_id}/start"
 
     response = requests.post(
-        cli_config.server_url + endpoint,
+        cli_config.server_url + endpoint + "?sev_policy=1",
         auth=HTTPBasicAuth(cli_config.username, cli_config.password),
     )
 
