@@ -4,8 +4,12 @@ from typing import Dict, Tuple
 from urllib.parse import urlparse
 from uuid import UUID
 
-from Crypto.Cipher import AES
-from Crypto.Util import Counter
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 
 from cli.toolkit.sev.sevtool import generate_launch_blob as sevtool_generate_launch_blob
 
@@ -101,18 +105,19 @@ def make_secret_table(disk_secret: str) -> bytearray:
     return secret_table
 
 
-def encrypt_secret_table(secret_table: bytearray, tek: bytes, iv: bytes) -> bytes:
-    ##
-    # encrypt the secret table with the TEK in ctr mode using a random IV
-    ##
 
-    # -EKNUCKLEHEADS in python crypto don't understand CTR mode
-    e = AES.new(
-        tek,
-        AES.MODE_CTR,
-        counter=Counter.new(128, initial_value=int.from_bytes(iv, byteorder="big")),
-    )
-    encrypted_secret = e.encrypt(bytes(secret_table))
+
+def encrypt_secret_table(secret_table: bytes, tek: bytes, iv: bytes) -> bytes:
+    """encrypt the secret table with the TEK in CTR mode using a random IV
+    """
+
+    # Initialize the cipher with AES algorithm and CTR mode
+    cipher = Cipher(algorithms.AES(tek), modes.CTR(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+
+    # Encrypt the secret table
+    encrypted_secret = encryptor.update(secret_table) + encryptor.finalize()
+
     return encrypted_secret
 
 
