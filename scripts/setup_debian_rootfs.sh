@@ -12,13 +12,15 @@ set -eo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOOP_DEVICE_ID=""
+MAPPER_NAME=""
 
 usage()
 {
     cat << USAGE >&2
 Usage:
-    $0 --loop-device LOOP_DEVICE_ID
+    $0 --loop-device LOOP_DEVICE_ID [--mapper-name MAPPER_NAME]
     -d LOOP_DEVICE_ID | --loop-device-id=LOOP_DEVICE_ID   Device ID of the disk image.
+    -m MAPPER_NAME | --mapper-name=MAPPER_NAME   Device mapped name for encrypted disk. Automatically set to "cr_root" if not specified.
 USAGE
 }
 
@@ -28,6 +30,10 @@ while test -n "$1"; do
     LOOP_DEVICE_ID=$2
     shift
     ;;
+  -p | --mapper-name)
+      MAPPER_NAME=$2
+      shift 2
+      ;;
   esac
   shift
 done
@@ -35,6 +41,10 @@ done
 if [ -z "${LOOP_DEVICE_ID}" ]; then
   usage
   exit 1
+fi
+
+if [ -z "${MAPPER_NAME}" ]; then
+  MAPPER_NAME=cr_root
 fi
 
 # The original password of the OS partition. Must be provided by the caller of the script.
@@ -45,6 +55,8 @@ OS_PARTITION_DEVICE_ID="${LOOP_DEVICE_ID}p2"
 
 BOOT_PARTITION_UUID=$(blkid --match-tag=UUID --output=value "${BOOT_PARTITION_DEVICE_ID}" )
 OS_PARTITION_UUID=$(blkid --match-tag=UUID --output=value "${OS_PARTITION_DEVICE_ID}" )
+
+MAPPED_DEVICE_ID="/dev/mapper/${MAPPER_NAME}"
 
 # Create key file to unlock the disk at boot
 mkdir -p /etc/cryptsetup-keys.d
@@ -63,9 +75,6 @@ echo "KEYFILE_PATTERN=\"/etc/cryptsetup-keys.d/*\"" >>/etc/cryptsetup-initramfs/
 
 # Reduce the accessibility of the initramfs
 echo "UMASK=0077" >> /etc/initramfs-tools/initramfs.conf
-
-MAPPER_NAME=cr_root
-MAPPED_DEVICE_ID="/dev/mapper/${MAPPER_NAME}"
 
 # Configure Grub and crypttab
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub

@@ -4,20 +4,22 @@ set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
+ROOTFS_DIR=""
+IMAGE_SIZE="4GB"
+IMAGE_FILE=""
+MAPPER_NAME="cr_root"
+
 usage() {
   cat <<USAGE >&2
 Usage:
-    $0 --rootfs-dir ROOTFS_DIR [--image-size IMAGE_SIZE] [--password DISK_PASSWORD]
+    $0 --rootfs-dir ROOTFS_DIR [--image-size IMAGE_SIZE] [--password DISK_PASSWORD] [--mapper-name MAPPER_NAME]
     -o IMAGE_FILE | --output IMAGE_FILE       Image file to use. Defaults to "<ROOTFS_DIR>.img."
     -p DISK_PASSWORD | --password=DISK_PASSWORD   Password to use for the encrypted disk. Automatically generated if not specified.
     -r ROOTFS_DIR | --rootfs-dir=ROOTFS_DIR   Directory containing the original rootfs.
     -s IMAGE_SIZE | --image-size IMAGE_SIZE   Size of the target image, ex: 20GB. Defaults to 4GB.
+    -m MAPPER_NAME | --mapper-name=MAPPER_NAME   Device mapped name for encrypted disk. Default to "cr_root" if not specified.
 USAGE
 }
-
-ROOTFS_DIR=""
-IMAGE_SIZE="4GB"
-IMAGE_FILE=""
 
 while true; do
   case "$1" in
@@ -37,6 +39,10 @@ while true; do
     IMAGE_SIZE=$2
     shift 2
     ;;
+  -m | --mapper-name)
+      MAPPER_NAME=$2
+      shift 2
+      ;;
   *)
     break
     ;;
@@ -87,7 +93,6 @@ echo "Formatting the boot partition..."
 sudo mkfs.vfat "${BOOT_PARTITION_DEVICE_ID}"
 
 echo "Encrypting and formatting the OS partition..."
-MAPPER_NAME=cr_root
 MAPPED_DEVICE_ID="/dev/mapper/${MAPPER_NAME}"
 MOUNT_POINT="/mnt/${MAPPER_NAME}"
 echo -n "${DISK_PASSWORD}" >"${KEY_FILE}"
@@ -103,7 +108,7 @@ sudo cp -R "${ROOTFS_DIR}"/* "${MOUNT_POINT}"
 echo "Configuring root file system..."
 for m in run sys proc dev; do sudo mount --bind /$m ${MOUNT_POINT}/$m; done
 sudo cp "${SCRIPT_DIR}/setup_debian_rootfs.sh" "${KEY_FILE}" "${MOUNT_POINT}"
-sudo chroot "${MOUNT_POINT}" bash setup_debian_rootfs.sh --loop-device-id "${LOOP_DEVICE_ID}"
+sudo chroot "${MOUNT_POINT}" bash setup_debian_rootfs.sh --loop-device-id "${LOOP_DEVICE_ID}" --mapper-name "${MAPPER_NAME}"
 sudo rm "${MOUNT_POINT}/setup_debian_rootfs.sh" "${KEY_FILE}"
 
 echo "Cleaning up..."
