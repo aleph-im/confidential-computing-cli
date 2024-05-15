@@ -12,8 +12,22 @@ of the hypervisor.
 
 To use this CLI tool, you need the following programs:
 
-* Docker (to run SEV Tool)
+* sevctl (or cargo to install it)
 * Qemu + KVM
+
+#### Install `sevctl`
+
+Requirements:
+ * `cargo`
+
+On Ubuntu/ Debian install it via `apt install cargo` (as root)
+
+To build and install sevctl
+```cargo install  sevctl```
+
+Ensure `$HOME/.cargo/bin` is in your PATH
+
+Alternatively you can build it from git : ```cargo install  --git  https://github.com/virtee/sevctl```
 
 ## Create an encrypted VM image
 
