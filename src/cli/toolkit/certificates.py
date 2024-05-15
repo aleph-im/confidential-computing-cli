@@ -18,6 +18,7 @@ CERTIFICATES_DIR = Path.cwd() / "certificates"
 
 def get_platform_certificates_dir(server_url: str) -> Path:
     hostname = urlparse(server_url).netloc
+    hostname = hostname.replace(':', '.')
     return CERTIFICATES_DIR / "platforms" / hostname
 
 
