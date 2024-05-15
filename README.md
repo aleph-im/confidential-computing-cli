@@ -80,6 +80,16 @@ At the moment, this requires:
 > the launch process properly. This is technically achievable with the AMD SEV-SNP extension
 > and the concept of Migration Agents.
 
+To set the config for the client, you can use environment variables
+```
+export SERVER_URL=http://127.0.0.1:9201
+export CRN_USER=olivier
+export CRN_PASSWORD=abc123
+
+```
+And then call crn-cli using : `crn-cli --server-url ${SERVER_URL} --username ${CRN_USER} --password ${CRN_PASSWORD}`
+
+
 First, allocate a VM:
 
 ```shell
