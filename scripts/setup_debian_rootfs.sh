@@ -28,14 +28,13 @@ while test -n "$1"; do
   case "$1" in
   -d | --loop-device-id)
     LOOP_DEVICE_ID=$2
-    shift
+    shift 2
     ;;
   -p | --mapper-name)
       MAPPER_NAME=$2
       shift 2
       ;;
   esac
-  shift
 done
 
 if [ -z "${LOOP_DEVICE_ID}" ]; then
