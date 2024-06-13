@@ -46,6 +46,11 @@ if [ -z "${MAPPER_NAME}" ]; then
   MAPPER_NAME=cr_root
 fi
 
+# Temporary tmp is needed for apt
+mount -t tmpfs  -o size=10M tmpfs /tmp
+#  Install crypsetup and openssh
+DEBIAN_FRONTEND=noninteractive apt update && apt install  -f openssh-server openssh-client cryptsetup cryptsetup-initramfs
+
 # The original password of the OS partition. Must be provided by the caller of the script.
 BOOT_KEY_FILE="${SCRIPT_DIR}/os_partition.key"
 
@@ -99,3 +104,5 @@ update-initramfs -u
 
 # Generate system SSH keys
 ssh-keygen -A
+
+umount /tmp
