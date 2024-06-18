@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 set -eo pipefail
 
@@ -62,7 +62,6 @@ if [ -z "${DISK_PASSWORD}" ]; then
   )
 fi
 
-
 if [ -z "${IMAGE_FILE}" ]; then
   IMAGE_FILE="$(basename ${ROOTFS_DIR}).img"
 fi
@@ -102,6 +101,7 @@ sudo cryptsetup open --key-file "${KEY_FILE}" "${OS_PARTITION_DEVICE_ID}" "${MAP
 sudo mkfs.ext4 "${MAPPED_DEVICE_ID}"
 
 echo "Copying root file system to the new OS partition..."
+sudo mkdir -p "${MOUNT_POINT}"
 sudo mount "${MAPPED_DEVICE_ID}" "${MOUNT_POINT}"
 sudo cp -R "${ROOTFS_DIR}"/* "${MOUNT_POINT}"
 
