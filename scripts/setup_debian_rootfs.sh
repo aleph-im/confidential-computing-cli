@@ -47,9 +47,10 @@ if [ -z "${MAPPER_NAME}" ]; then
 fi
 
 # Temporary tmp is needed for apt
-mount -t tmpfs  -o size=10M tmpfs /tmp
+mount -t tmpfs  -o size=100M tmpfs /tmp
 #  Install crypsetup and openssh
-DEBIAN_FRONTEND=noninteractive apt update && apt install  -f openssh-server openssh-client cryptsetup cryptsetup-initramfs
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt install -y -f openssh-server openssh-client cryptsetup cryptsetup-initramfs
 
 # The original password of the OS partition. Must be provided by the caller of the script.
 BOOT_KEY_FILE="${SCRIPT_DIR}/os_partition.key"
