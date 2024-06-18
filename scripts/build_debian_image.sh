@@ -8,6 +8,35 @@ ROOTFS_DIR=""
 IMAGE_SIZE="4GB"
 IMAGE_FILE=""
 MAPPER_NAME="cr_root"
+LOOP_DEVICE_ID=""
+MAPPED_DEVICE_ID=""
+MOUNT_POINT=""
+
+cleanup() {
+  echo "Cleaning up..."
+  if mountpoint -q "${MOUNT_POINT}"; then
+    sudo umount --recursive "${MOUNT_POINT}" || echo "Failed to unmount ${MOUNT_POINT}"
+  fi
+  if [ -n "${MAPPED_DEVICE_ID}" ]; then
+    sudo cryptsetup close "${MAPPED_DEVICE_ID}" || echo "Failed to close encrypted device ${MAPPED_DEVICE_ID}"
+  fi
+  if [ -n "${LOOP_DEVICE_ID}" ]; then
+    sudo losetup -d "${LOOP_DEVICE_ID}" || echo "Failed to detach loop device ${LOOP_DEVICE_ID}"
+  fi
+  if [ -f "${KEY_FILE}" ]; then
+    rm -f "${KEY_FILE}" || echo "Failed to remove key file ${KEY_FILE}"
+  fi
+}
+
+
+# Trap command to catch and handle various signals:
+# - EXIT: Triggered when the script exits (normal completion or an error).
+# - HUP (SIGHUP): Signal 1, sent when the controlling terminal is closed (e.g., terminal window closed or SSH session logout).
+# - INT (SIGINT): Signal 2, sent when the user interrupts the process (e.g., pressing Ctrl+C).
+# - QUIT (SIGQUIT): Signal 3, sent when the user requests the process to quit and perform a core dump (e.g., pressing Ctrl+\).
+# - PIPE (SIGPIPE): Signal 13, sent when attempting to write to a pipe without a reader (e.g., in scripts using pipelines if a command in the pipeline exits prematurely).
+# - TERM (SIGTERM): Signal 15, sent by the kill command to request the process to terminate gracefully.
+trap cleanup HUP INT QUIT PIPE TERM
 
 usage() {
   cat <<USAGE >&2
@@ -111,10 +140,7 @@ sudo cp "${SCRIPT_DIR}/setup_debian_rootfs.sh" "${KEY_FILE}" "${MOUNT_POINT}"
 sudo chroot "${MOUNT_POINT}" bash setup_debian_rootfs.sh --loop-device-id "${LOOP_DEVICE_ID}" --mapper-name "${MAPPER_NAME}"
 sudo rm "${MOUNT_POINT}/setup_debian_rootfs.sh" "${KEY_FILE}"
 
-echo "Cleaning up..."
-sudo umount --recursive "${MOUNT_POINT}"
-sudo cryptsetup close "${MAPPED_DEVICE_ID}"
-sudo losetup -d "${LOOP_DEVICE_ID}"
+cleanup
 
 echo "Done! The new image is available as ${IMAGE_FILE}."
 echo "Disk password: ${DISK_PASSWORD}"
